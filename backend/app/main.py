@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.api.v1.router import api_router
 
 
 app = FastAPI(
@@ -30,6 +31,9 @@ def health_check():
         "version": settings.app_version,
         "env": settings.app_env,
     }
+
+
+app.include_router(api_router)
 
 
 @app.get("/", tags=["System"])
