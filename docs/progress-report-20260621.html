@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dating App MVP — 開發進度報告 2026-06-21</title>
+<style>
+  :root {
+    --primary: #6C63FF;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --bg: #0f0f1a;
+    --card: #1a1a2e;
+    --card2: #16213e;
+    --border: #2a2a4a;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, #6C63FF 0%, #e96cce 100%); padding: 48px 32px; text-align: center; }
+  .header h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 8px; }
+  .header p { color: rgba(255,255,255,0.85); font-size: 1rem; }
+  .header .date { display: inline-block; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 4px 16px; font-size: 0.85rem; margin-top: 10px; }
+
+  /* Container */
+  .container { max-width: 1100px; margin: 0 auto; padding: 32px 20px; }
+
+  /* Summary cards */
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 40px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+  .stat-card .num { font-size: 2.4rem; font-weight: 800; }
+  .stat-card .label { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+  .stat-card.green .num { color: var(--success); }
+  .stat-card.purple .num { color: var(--primary); }
+  .stat-card.blue .num { color: var(--info); }
+  .stat-card.yellow .num { color: var(--warning); }
+
+  /* Section */
+  .section { margin-bottom: 40px; }
+  .section-title { font-size: 1.3rem; font-weight: 700; padding-bottom: 10px; border-bottom: 2px solid var(--border); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .section-title span { background: var(--primary); border-radius: 6px; padding: 2px 10px; font-size: 0.8rem; }
+
+  /* Timeline / Phase cards */
+  .phase-grid { display: grid; gap: 16px; }
+  .phase-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .phase-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; cursor: default; }
+  .phase-header h3 { font-size: 1rem; font-weight: 700; }
+  .phase-header .meta { font-size: 0.8rem; color: var(--muted); }
+  .phase-body { padding: 0 20px 16px; }
+  .phase-header.done { background: linear-gradient(90deg, rgba(34,197,94,0.15), transparent); border-left: 4px solid var(--success); }
+  .phase-header.pending { background: linear-gradient(90deg, rgba(59,130,246,0.1), transparent); border-left: 4px solid var(--info); }
+  .phase-header.future { background: linear-gradient(90deg, rgba(148,163,184,0.08), transparent); border-left: 4px solid var(--muted); }
+
+  /* Badge */
+  .badge { display: inline-block; border-radius: 20px; padding: 3px 10px; font-size: 0.72rem; font-weight: 600; }
+  .badge.done { background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.3); }
+  .badge.pending { background: rgba(59,130,246,0.15); color: var(--info); border: 1px solid rgba(59,130,246,0.3); }
+  .badge.future { background: rgba(148,163,184,0.1); color: var(--muted); border: 1px solid var(--border); }
+
+  /* Checklist */
+  .checklist { list-style: none; margin-top: 12px; display: grid; gap: 6px; }
+  .checklist li { display: flex; align-items: flex-start; gap: 8px; font-size: 0.88rem; }
+  .checklist li .icon { flex-shrink: 0; margin-top: 2px; }
+  .check { color: var(--success); }
+  .cross { color: var(--danger); }
+  .wait { color: var(--info); }
+  .fix { color: var(--warning); }
+
+  /* Tech stack table */
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+  th { background: var(--card2); color: var(--muted); padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Milestone timeline */
+  .milestone-list { display: grid; gap: 10px; }
+  .milestone-row { display: flex; gap: 12px; align-items: flex-start; }
+  .milestone-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .milestone-dot.done { background: var(--success); }
+  .milestone-dot.next { background: var(--info); box-shadow: 0 0 8px var(--info); }
+  .milestone-dot.future { background: var(--border); }
+  .milestone-content { flex: 1; }
+  .milestone-content strong { font-size: 0.92rem; }
+  .milestone-content .date { font-size: 0.78rem; color: var(--muted); }
+  .milestone-line { width: 2px; height: 30px; background: var(--border); margin-left: 6px; }
+
+  /* API list */
+  .api-list { display: grid; gap: 8px; margin-top: 12px; }
+  .api-item { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; background: var(--card2); border-radius: 8px; padding: 8px 12px; }
+  .method { font-weight: 700; font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; flex-shrink: 0; }
+  .method.post { background: rgba(34,197,94,0.2); color: #4ade80; }
+  .method.get { background: rgba(59,130,246,0.2); color: #60a5fa; }
+  .method.put { background: rgba(245,158,11,0.2); color: #fbbf24; }
+  .method.delete { background: rgba(239,68,68,0.2); color: #f87171; }
+  .api-path { font-family: monospace; color: var(--text); }
+  .api-desc { color: var(--muted); margin-left: auto; font-size: 0.78rem; }
+
+  /* Fix log */
+  .fix-list { display: grid; gap: 8px; margin-top: 12px; }
+  .fix-item { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); border-radius: 8px; padding: 10px 14px; font-size: 0.85rem; }
+  .fix-item strong { color: var(--warning); }
+
+  /* Next phase */
+  .next-card { background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(108,99,255,0.1)); border: 1px solid rgba(108,99,255,0.3); border-radius: 12px; padding: 24px; margin-top: 16px; }
+  .next-card h3 { color: var(--primary); margin-bottom: 16px; font-size: 1.1rem; }
+  .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; margin-top: 12px; }
+  .task-item { background: var(--card); border-radius: 8px; padding: 12px; font-size: 0.85rem; border-left: 3px solid var(--info); }
+  .task-item strong { display: block; margin-bottom: 4px; color: var(--info); }
+
+  /* Footer */
+  .footer { text-align: center; padding: 32px; color: var(--muted); font-size: 0.82rem; border-top: 1px solid var(--border); margin-top: 40px; }
+  .footer a { color: var(--primary); text-decoration: none; }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .header h1 { font-size: 1.5rem; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>💘 Dating App MVP</h1>
+  <p>開發進度報告 — Phase 0 & Phase 1 完成</p>
+  <div class="date">📅 2026-06-21 &nbsp;|&nbsp; 工程師：s07362022</div>
+</div>
+
+<div class="container">
+
+  <!-- Summary -->
+  <div class="summary-grid">
+    <div class="stat-card green"><div class="num">19</div><div class="label">pytest 通過數</div></div>
+    <div class="stat-card purple"><div class="num">9</div><div class="label">API 端點</div></div>
+    <div class="stat-card blue"><div class="num">7</div><div class="label">DB 資料表</div></div>
+    <div class="stat-card yellow"><div class="num">3</div><div class="label">Git Commits</div></div>
+    <div class="stat-card green"><div class="num">2/8</div><div class="label">里程碑完成</div></div>
+  </div>
+
+  <!-- Tech Stack -->
+  <div class="section">
+    <div class="section-title">🛠 技術架構 <span>已確認</span></div>
+    <table>
+      <thead><tr><th>層級</th><th>技術</th><th>版本</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>後端框架</td><td>FastAPI</td><td>0.138.0</td><td><span class="badge done">✅ 運行中</span></td></tr>
+        <tr><td>資料庫</td><td>PostgreSQL (Docker)</td><td>16.14</td><td><span class="badge done">✅ healthy</span></td></tr>
+        <tr><td>ORM</td><td>SQLAlchemy</td><td>2.0.51</td><td><span class="badge done">✅ 已配置</span></td></tr>
+        <tr><td>Migration</td><td>Alembic</td><td>1.18.4</td><td><span class="badge done">✅ initial_schema 執行完</span></td></tr>
+        <tr><td>認證</td><td>JWT (python-jose) + bcrypt</td><td>—</td><td><span class="badge done">✅ 運作中</span></td></tr>
+        <tr><td>驗證</td><td>Pydantic v2 + pydantic-settings</td><td>2.13.4</td><td><span class="badge done">✅ 完成</span></td></tr>
+        <tr><td>測試</td><td>pytest + httpx + TestClient</td><td>9.1.1</td><td><span class="badge done">✅ 19/19</span></td></tr>
+        <tr><td>DB GUI</td><td>DBeaver Community</td><td>26.1.0</td><td><span class="badge done">✅ 已連線</span></td></tr>
+        <tr><td>版本控管</td><td>Git + GitHub</td><td>2.53.0</td><td><span class="badge done">✅ 已推送</span></td></tr>
+        <tr><td>Android App</td><td>Kivy / KivyMD (評估中)</td><td>—</td><td><span class="badge future">⬜ Phase 5</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Milestone Timeline -->
+  <div class="section">
+    <div class="section-title">🗓 里程碑時間表</div>
+    <div class="milestone-list">
+      <div class="milestone-row">
+        <div><div class="milestone-dot done"></div><div class="milestone-line"></div></div>
+        <div class="milestone-content"><strong>M1 — 專案骨架完成</strong> <span class="badge done">✅ 完成</span><div class="date">2026-06-22（實際：2026-06-21）FastAPI 骨架、Docker PostgreSQL、Git 初始化</div></div>
+      </div>
+      <div class="milestone-row">
+        <div><div class="milestone-dot done"></div><div class="milestone-line"></div></div>
+        <div class="milestone-content"><strong>M2 — 帳號與個人檔案完成</strong> <span class="badge done">✅ 完成</span><div class="date">2026-06-29（實際：2026-06-21）註冊、登入、JWT、個人檔案、偏好設定</div></div>
+      </div>
+      <div class="milestone-row">
+        <div><div class="milestone-dot next"></div><div class="milestone-line"></div></div>
+        <div class="milestone-content"><strong>M3 — 照片與推薦 API 完成</strong> <span class="badge pending">⏳ 下一步</span><div class="date">目標：2026-07-06　照片上傳、Discover API、假資料</div></div>
+      </div>
+      <div class="milestone-row">
+        <div><div class="milestone-dot future"></div><div class="milestone-line"></div></div>
+        <div class="milestone-content"><strong>M4 — 喜歡與配對完成</strong> <span class="badge future">⬜ 待開始</span><div class="date">目標：2026-07-13</div></div>
+      </div>
+      <div class="milestone-row">
+        <div><div class="milestone-dot future"></div><div class="milestone-line"></div></div>
+        <div class="milestone-content"><strong>M5 — 聊天功能完成</strong> <span class="badge future">⬜ 待開始</span><div class="date">目標：2026-07-20</div></div>
+      </div>
+      <div class="milestone-row">
+        <div><div class="milestone-dot future"></div><div class="milestone-line"></div></div>
+        <div class="milestone-content"><strong>M5.5 — 升級 JDK 17</strong> <span class="badge future">⬜ 待開始</span><div class="date">目標：2026-07-27　（目前 Java 8，Android Studio 需要 JDK 17+）</div></div>
+      </div>
+      <div class="milestone-row">
+        <div><div class="milestone-dot future"></div><div class="milestone-line"></div></div>
+        <div class="milestone-content"><strong>M6 — Android 原型完成</strong> <span class="badge future">⬜ 待開始</span><div class="date">目標：2026-08-10</div></div>
+      </div>
+      <div class="milestone-row">
+        <div><div class="milestone-dot future"></div><div class="milestone-line"></div></div>
+        <div class="milestone-content"><strong>M7 — 安全與管理後台完成</strong> <span class="badge future">⬜ 待開始</span><div class="date">目標：2026-08-17</div></div>
+      </div>
+      <div class="milestone-row">
+        <div><div class="milestone-dot future"></div></div>
+        <div class="milestone-content"><strong>M8 — 內測版本完成</strong> <span class="badge future">⬜ 待開始</span><div class="date">目標：2026-08-31　10 位測試者 staging 連線</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase Detail -->
+  <div class="section">
+    <div class="section-title">📋 各階段詳細工作流</div>
+    <div class="phase-grid">
+
+      <!-- Phase 0 -->
+      <div class="phase-card">
+        <div class="phase-header done">
+          <h3>⚙️ Phase 0 — 本機環境與專案骨架</h3>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="meta">2026-06-21</span>
+            <span class="badge done">✅ 完成</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <ul class="checklist">
+            <li><span class="icon check">✅</span> 確認環境：Python 3.10.11、Git 2.53.0、Node.js v24、Docker 29.5.3、Java 1.8</li>
+            <li><span class="icon check">✅</span> GitHub CLI 登入（帳號：s07362022）</li>
+            <li><span class="icon check">✅</span> 建立 canonical 路徑：F:\cursor_coding\project01\dating-app</li>
+            <li><span class="icon check">✅</span> 建立完整資料夾結構（backend/app/core、models、schemas、api、services、db）</li>
+            <li><span class="icon check">✅</span> 建立 Python 虛擬環境 .venv</li>
+            <li><span class="icon check">✅</span> 安裝 13 個 Python 套件（fastapi、uvicorn、sqlalchemy、pydantic-settings、bcrypt、python-jose、psycopg2-binary、pillow、alembic 等）</li>
+            <li><span class="icon check">✅</span> docker-compose.yml — PostgreSQL 16 Alpine，port 5432</li>
+            <li><span class="icon check">✅</span> FastAPI app — /health API，回傳 {"status":"ok"}</li>
+            <li><span class="icon check">✅</span> .env.example + .env 設定檔</li>
+            <li><span class="icon check">✅</span> README.md + docs/deployment.md</li>
+            <li><span class="icon check">✅</span> .gitignore（排除 .env、.venv、uploads）</li>
+            <li><span class="icon check">✅</span> git init + 第一個 commit (f1baed2)</li>
+            <li><span class="icon check">✅</span> GitHub repo 建立：github.com/s07362022/datefortest</li>
+            <li><span class="icon check">✅</span> DBeaver 26.1.0 安裝與 PostgreSQL 連線確認</li>
+            <li><span class="icon check">✅</span> Setup log 建立：dating-app-md/logs/setup-20260621.log</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 1 -->
+      <div class="phase-card">
+        <div class="phase-header done">
+          <h3>🔐 Phase 1 — 帳號系統與個人檔案</h3>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="meta">2026-06-21</span>
+            <span class="badge done">✅ 完成</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <ul class="checklist">
+            <li><span class="icon check">✅</span> SQLAlchemy Models：User、Profile、Tag、ProfileTag、Photo、Preference</li>
+            <li><span class="icon check">✅</span> Pydantic Schemas：RegisterRequest（密碼強度驗證）、LoginRequest、TokenResponse、ProfileUpdate、ProfileOut、PublicProfileOut、PreferenceUpdate、PreferenceOut</li>
+            <li><span class="icon check">✅</span> core/security.py：bcrypt 密碼雜湊、JWT 產生（含 user_id、is_admin、iat、exp）</li>
+            <li><span class="icon check">✅</span> api/deps.py：get_current_user（含停權 is_active 即時驗證）、get_current_admin</li>
+            <li><span class="icon check">✅</span> POST /auth/register — 重複 email 回 409</li>
+            <li><span class="icon check">✅</span> POST /auth/login — 錯誤密碼回 401</li>
+            <li><span class="icon check">✅</span> GET /auth/me — 需 Bearer token</li>
+            <li><span class="icon check">✅</span> GET/PUT /profiles/me — 18 歲限制、檔案完成條件</li>
+            <li><span class="icon check">✅</span> GET /profiles/{user_id} — 不暴露 GPS，回傳距離區間</li>
+            <li><span class="icon check">✅</span> GET/PUT /preferences/me — 偏好年齡、距離、性別</li>
+            <li><span class="icon check">✅</span> services/profile_service.py：is_profile_complete()、_is_adult()、distance_band()、haversine_km()</li>
+            <li><span class="icon check">✅</span> Alembic 初始化 + initial_schema migration 執行完成</li>
+            <li><span class="icon check">✅</span> 7 個 DB 資料表建立：users、profiles、tags、profile_tags、photos、preferences、alembic_version</li>
+            <li><span class="icon check">✅</span> tests/conftest.py：獨立測試 DB（datingapp_test）、rollback fixture</li>
+            <li><span class="icon check">✅</span> tests/test_auth.py：11 個測試全通過</li>
+            <li><span class="icon check">✅</span> tests/test_profile.py：8 個測試全通過</li>
+            <li><span class="icon check">✅</span> pytest 19/19 PASSED，0 warnings</li>
+            <li><span class="icon check">✅</span> git commit (5bd8a08) + push 到 GitHub</li>
+          </ul>
+
+          <div style="margin-top:16px">
+            <div style="font-size:0.82rem;color:var(--muted);margin-bottom:8px">修正紀錄</div>
+            <div class="fix-list">
+              <div class="fix-item"><strong>[FIX]</strong> email-validator 未安裝 → pip install pydantic[email]</div>
+              <div class="fix-item"><strong>[FIX]</strong> passlib 與 bcrypt 5.x 不相容 → 改用 bcrypt 直接調用</div>
+              <div class="fix-item"><strong>[FIX]</strong> Profile.photos viewonly relationship 衝突 → 移除，由 user.photos 存取</div>
+              <div class="fix-item"><strong>[FIX]</strong> test_me_no_token 斷言 403 應為 401（HTTPBearer 行為）</div>
+              <div class="fix-item"><strong>[FIX]</strong> Pydantic v2 class Config 棄用 → 改用 model_config dict</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Phase 2 -->
+      <div class="phase-card">
+        <div class="phase-header pending">
+          <h3>📸 Phase 2 — 照片上傳與探索推薦</h3>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="meta">目標：2026-07-06</span>
+            <span class="badge pending">⏳ 下一步</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <ul class="checklist">
+            <li><span class="icon wait">⏳</span> POST /photos — 上傳照片（最多 6 張、5MB、JPEG/PNG/WebP、400×400 最小尺寸）</li>
+            <li><span class="icon wait">⏳</span> GET /photos/me — 查看自己的照片列表</li>
+            <li><span class="icon wait">⏳</span> DELETE /photos/{photo_id} — 刪除照片</li>
+            <li><span class="icon wait">⏳</span> PUT /photos/{photo_id}/primary — 設定主照片</li>
+            <li><span class="icon wait">⏳</span> GET /discover?limit=20&cursor= — 推薦對象列表</li>
+            <li><span class="icon wait">⏳</span> 推薦評分：profile_complete_score + recent_active_score + distance_score + shared_interest_score</li>
+            <li><span class="icon wait">⏳</span> 排除：自己、已封鎖、已 like/pass 的人</li>
+            <li><span class="icon wait">⏳</span> 距離計算：haversine_km + distance_band 整合</li>
+            <li><span class="icon wait">⏳</span> Tags seed data — 預設興趣標籤清單</li>
+            <li><span class="icon wait">⏳</span> seed_data.py — 假資料產生器（10 位測試用戶）</li>
+            <li><span class="icon wait">⏳</span> tests/test_photos.py + tests/test_discover.py</li>
+            <li><span class="icon wait">⏳</span> git commit + log 更新</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 3 -->
+      <div class="phase-card">
+        <div class="phase-header future">
+          <h3>💕 Phase 3 — 喜歡、略過與配對</h3>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="meta">目標：2026-07-13</span>
+            <span class="badge future">⬜ 待開始</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <ul class="checklist">
+            <li><span class="icon wait">⏳</span> likes / matches 資料模型</li>
+            <li><span class="icon wait">⏳</span> POST /likes — 喜歡或略過</li>
+            <li><span class="icon wait">⏳</span> 雙向喜歡自動建立 match</li>
+            <li><span class="icon wait">⏳</span> GET /matches — 配對列表</li>
+            <li><span class="icon wait">⏳</span> DELETE /matches/{match_id} — 解除配對</li>
+            <li><span class="icon wait">⏳</span> 每日 50 likes 限額（Asia/Taipei 00:00 重置，feature flag）</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 4 -->
+      <div class="phase-card">
+        <div class="phase-header future">
+          <h3>💬 Phase 4 — 聊天</h3>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="meta">目標：2026-07-20</span>
+            <span class="badge future">⬜ 待開始</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <ul class="checklist">
+            <li><span class="icon wait">⏳</span> messages 資料模型</li>
+            <li><span class="icon wait">⏳</span> POST /matches/{match_id}/messages — 傳送訊息</li>
+            <li><span class="icon wait">⏳</span> GET /matches/{match_id}/messages?since_message_id= — 3-5 秒 polling</li>
+            <li><span class="icon wait">⏳</span> 只有配對雙方可聊天</li>
+            <li><span class="icon wait">⏳</span> （後期升級 WebSocket）</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 5 -->
+      <div class="phase-card">
+        <div class="phase-header future">
+          <h3>📱 Phase 5 — Android 原型</h3>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="meta">目標：2026-08-10</span>
+            <span class="badge future">⬜ 待開始</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <ul class="checklist">
+            <li><span class="icon wait">⏳</span> 升級 JDK 17+（目前 Java 8，不相容 Android Studio）</li>
+            <li><span class="icon wait">⏳</span> 安裝 Android Studio / Android SDK</li>
+            <li><span class="icon wait">⏳</span> 評估 Kivy/KivyMD 或 Flutter</li>
+            <li><span class="icon wait">⏳</span> 登入、個人檔案、探索卡片、配對列表、聊天畫面</li>
+            <li><span class="icon wait">⏳</span> 串接後端 API（local / staging 可切換）</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 6 -->
+      <div class="phase-card">
+        <div class="phase-header future">
+          <h3>🛡 Phase 6 — 安全與管理後台</h3>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="meta">目標：2026-08-17</span>
+            <span class="badge future">⬜ 待開始</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <ul class="checklist">
+            <li><span class="icon wait">⏳</span> blocks / reports / admin_actions 資料模型</li>
+            <li><span class="icon wait">⏳</span> POST /blocks、GET /blocks、DELETE /blocks/{user_id}</li>
+            <li><span class="icon wait">⏳</span> POST /reports（假帳號、騷擾、詐騙等）</li>
+            <li><span class="icon wait">⏳</span> GET/PUT /admin/reports、/admin/users、/admin/photos</li>
+            <li><span class="icon wait">⏳</span> 停權功能 + admin_actions audit log</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Phase 7 -->
+      <div class="phase-card">
+        <div class="phase-header future">
+          <h3>🚀 Phase 7 — 內測準備</h3>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="meta">目標：2026-08-31</span>
+            <span class="badge future">⬜ 待開始</span>
+          </div>
+        </div>
+        <div class="phase-body">
+          <ul class="checklist">
+            <li><span class="icon wait">⏳</span> Railway Staging 部署（非 localhost）</li>
+            <li><span class="icon wait">⏳</span> E2E 測試：註冊→完成檔案→互相喜歡→配對→聊天</li>
+            <li><span class="icon wait">⏳</span> 隱私政策草稿 + 服務條款草稿</li>
+            <li><span class="icon wait">⏳</span> 10 位真人測試者邀請與問卷</li>
+            <li><span class="icon wait">⏳</span> 錯誤處理補齊 + 日誌完善</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Current APIs -->
+  <div class="section">
+    <div class="section-title">🔌 已完成 API 端點</div>
+    <div class="api-list">
+      <div class="api-item"><span class="method post">POST</span><span class="api-path">/auth/register</span><span class="api-desc">Email 註冊，回傳 JWT token</span></div>
+      <div class="api-item"><span class="method post">POST</span><span class="api-path">/auth/login</span><span class="api-desc">Email + 密碼登入</span></div>
+      <div class="api-item"><span class="method get">GET</span><span class="api-path">/auth/me</span><span class="api-desc">查看目前登入帳號資料</span></div>
+      <div class="api-item"><span class="method get">GET</span><span class="api-path">/profiles/me</span><span class="api-desc">查看自己的個人檔案</span></div>
+      <div class="api-item"><span class="method put">PUT</span><span class="api-path">/profiles/me</span><span class="api-desc">更新個人檔案（18歲限制）</span></div>
+      <div class="api-item"><span class="method get">GET</span><span class="api-path">/profiles/{user_id}</span><span class="api-desc">查看他人公開檔案（不含 GPS）</span></div>
+      <div class="api-item"><span class="method get">GET</span><span class="api-path">/preferences/me</span><span class="api-desc">查看配對偏好</span></div>
+      <div class="api-item"><span class="method put">PUT</span><span class="api-path">/preferences/me</span><span class="api-desc">更新配對偏好（年齡、距離、性別）</span></div>
+      <div class="api-item"><span class="method get">GET</span><span class="api-path">/health</span><span class="api-desc">系統健康檢查</span></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Dating App MVP &nbsp;|&nbsp; GitHub: <a href="https://github.com/s07362022/datefortest" target="_blank">github.com/s07362022/datefortest</a></p>
+    <p style="margin-top:6px">報告產生時間：2026-06-21 02:14 (UTC+8) &nbsp;|&nbsp; 下一步：Phase 2 照片上傳 + Discover 推薦 API</p>
+  </div>
+
+</div>
+</body>
+</html>
