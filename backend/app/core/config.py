@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     daily_like_limit: int = 50
     like_limit_enabled: bool = True
 
+    # Docker / seed (用於 docker-compose 與初始資料，不對外暴露)
+    postgres_password: str = "devpassword123"
+    admin_email: str = "admin@example.com"
+    admin_password: str = "change_this_admin_password"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
