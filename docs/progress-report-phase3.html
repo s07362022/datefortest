@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dating App MVP — Phase 3 進度報告</title>
+  <style>
+    :root {
+      --primary: #e85d75;
+      --primary-dark: #c23f5c;
+      --accent: #ff9eb0;
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --surface2: #16213e;
+      --border: #2a2a4a;
+      --text: #e8e8f0;
+      --muted: #8888aa;
+      --green: #4caf82;
+      --yellow: #f5c842;
+      --blue: #4f8ef7;
+      --red: #e85d75;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; }
+
+    header {
+      background: linear-gradient(135deg, #c23f5c 0%, #7b2ff7 100%);
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.4rem; font-weight: 800; }
+    header p { color: rgba(255,255,255,0.85); margin-top: .5rem; font-size: 1.05rem; }
+    .badges { display: flex; gap: .75rem; justify-content: center; margin-top: 1.25rem; flex-wrap: wrap; }
+    .badge { background: rgba(255,255,255,0.18); border-radius: 20px; padding: .3rem .9rem; font-size: .85rem; font-weight: 600; }
+    .badge.green  { background: rgba(76,175,130,0.35); color: #a8f0ce; }
+    .badge.blue   { background: rgba(79,142,247,0.35); color: #a8c8ff; }
+    .badge.purple { background: rgba(123,47,247,0.35); color: #d0b8ff; }
+    .badge.yellow { background: rgba(245,200,66,0.35); color: #ffe080; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+    section { margin-bottom: 2.5rem; }
+    h2 { font-size: 1.35rem; font-weight: 700; color: var(--primary); border-left: 4px solid var(--primary); padding-left: .75rem; margin-bottom: 1.25rem; }
+    h3 { font-size: 1.05rem; font-weight: 600; color: var(--accent); margin-bottom: .75rem; margin-top: 1.25rem; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; }
+    .stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; text-align: center; }
+    .stat .num   { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
+    .stat .label { font-size: .8rem; color: var(--muted); margin-top: .2rem; text-transform: uppercase; letter-spacing: .5px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+    th { background: var(--surface2); color: var(--muted); font-weight: 600; text-align: left; padding: .65rem 1rem; border-bottom: 1px solid var(--border); }
+    td { padding: .65rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.03); }
+    .done   { color: var(--green);  font-weight: 600; }
+    .next   { color: var(--yellow); font-weight: 600; }
+    .future { color: var(--muted); }
+
+    .endpoint-item { display: flex; align-items: flex-start; gap: .75rem; padding: .6rem .75rem; border-radius: 8px; margin-bottom: .4rem; background: var(--surface2); border: 1px solid var(--border); font-family: monospace; font-size: .875rem; }
+    .method { font-weight: 700; min-width: 60px; text-align: center; border-radius: 5px; padding: .15rem .4rem; font-size: .8rem; }
+    .method.GET    { background: rgba(79,142,247,0.2);  color: #7eb8ff; border: 1px solid #4f8ef7; }
+    .method.POST   { background: rgba(76,175,130,0.2);  color: #a8f0ce; border: 1px solid #4caf82; }
+    .method.PUT    { background: rgba(245,200,66,0.2);  color: #ffe080; border: 1px solid #f5c842; }
+    .method.DELETE { background: rgba(232,93,117,0.2);  color: #ffb0bb; border: 1px solid #e85d75; }
+    .path { color: var(--text); flex: 1; }
+    .desc { color: var(--muted); font-family: 'Segoe UI', sans-serif; font-size: .82rem; }
+    .new-badge { background: var(--primary); color: #fff; border-radius: 4px; padding: .1rem .4rem; font-size: .7rem; font-family: sans-serif; font-weight: 700; }
+    .p2-badge  { background: #7b2ff7; color: #fff; border-radius: 4px; padding: .1rem .4rem; font-size: .7rem; font-family: sans-serif; font-weight: 700; }
+
+    .test-bar { background: var(--surface2); border-radius: 10px; overflow: hidden; height: 24px; margin-bottom: .75rem; }
+    .test-fill { background: linear-gradient(90deg, var(--green), #2ecc71); height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 700; color: #fff; }
+
+    .steps { counter-reset: step; }
+    .step { counter-increment: step; padding: .85rem 1rem .85rem 3.5rem; position: relative; border-left: 3px solid var(--border); margin-bottom: .5rem; background: var(--surface2); border-radius: 0 8px 8px 0; }
+    .step::before { content: counter(step); position: absolute; left: -1px; top: 50%; transform: translateY(-50%); background: var(--primary); color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .step code { background: rgba(255,255,255,0.08); padding: .15rem .4rem; border-radius: 4px; font-size: .88rem; color: var(--accent); font-family: monospace; }
+
+    .flow { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; margin: 1rem 0; }
+    .flow-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: .5rem 1rem; font-size: .88rem; }
+    .flow-box.trigger { border-color: var(--primary); color: var(--primary); font-weight: 700; }
+    .flow-box.result  { border-color: var(--green);   color: var(--green);   font-weight: 700; }
+    .flow-arrow { color: var(--muted); font-size: 1.2rem; }
+
+    .ps-block { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 1.25rem; font-family: 'Consolas', monospace; font-size: .85rem; line-height: 1.8; overflow-x: auto; }
+    .ps-comment { color: #6e7681; }
+    .ps-cmd     { color: #79c0ff; }
+    .ps-str     { color: #a5d6ff; }
+    .ps-var     { color: #ffa657; }
+    .ps-out     { color: #56d364; }
+
+    code { background: rgba(255,255,255,0.08); padding: .15rem .4rem; border-radius: 4px; font-size: .88rem; color: var(--accent); font-family: monospace; }
+    a    { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .next-item { display: flex; gap: .75rem; align-items: flex-start; padding: .6rem 0; border-bottom: 1px solid var(--border); }
+    .next-item:last-child { border-bottom: none; }
+    .next-bullet { color: var(--yellow); font-size: 1.1rem; }
+    .next-content strong { color: var(--text); }
+    .next-content p { color: var(--muted); font-size: .85rem; margin-top: .1rem; }
+
+    footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 2rem; border-top: 1px solid var(--border); margin-top: 2rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💕 Dating App MVP</h1>
+  <p>Phase 3 完成報告 ─ 配對系統（Like / Pass / Match）</p>
+  <div class="badges">
+    <span class="badge green">55/55 Tests PASSED</span>
+    <span class="badge blue">20 API Endpoints</span>
+    <span class="badge yellow">M4 完成超前22天</span>
+    <span class="badge purple">9 DB Tables</span>
+    <span class="badge">2026-06-21</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Stats -->
+  <section>
+    <h2>📊 累計數據</h2>
+    <div class="stats">
+      <div class="stat"><div class="num">55</div><div class="label">Tests Passed</div></div>
+      <div class="stat"><div class="num">20</div><div class="label">API Endpoints</div></div>
+      <div class="stat"><div class="num">6</div><div class="label">Git Commits</div></div>
+      <div class="stat"><div class="num">9</div><div class="label">DB Tables</div></div>
+      <div class="stat"><div class="num">30</div><div class="label">Interest Tags</div></div>
+      <div class="stat"><div class="num">50</div><div class="label">Daily Like Limit</div></div>
+    </div>
+  </section>
+
+  <!-- Milestone -->
+  <section>
+    <h2>🗓 里程碑進度</h2>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <table>
+        <thead><tr><th>里程碑</th><th>目標日期</th><th>實際完成</th><th>狀態</th></tr></thead>
+        <tbody>
+          <tr><td>M1 專案骨架</td><td>2026-06-22</td><td>2026-06-21</td><td class="done">✅ 完成</td></tr>
+          <tr><td>M2 帳號 + 個人檔案</td><td>2026-06-29</td><td>2026-06-21</td><td class="done">✅ 完成</td></tr>
+          <tr><td>M3 照片 + 推薦</td><td>2026-07-06</td><td>2026-06-21</td><td class="done">✅ 完成</td></tr>
+          <tr><td>M4 配對（Like / Pass / Match）</td><td>2026-07-13</td><td>2026-06-21</td><td class="done">✅ 完成（超前22天）</td></tr>
+          <tr><td>M5 聊天（WebSocket）</td><td>2026-07-20</td><td>—</td><td class="next">⏳ 下一步</td></tr>
+          <tr><td>M5.5 升 JDK 17</td><td>2026-07-27</td><td>—</td><td class="future">⬜ 待開始</td></tr>
+          <tr><td>M6 Android 原型</td><td>2026-08-10</td><td>—</td><td class="future">⬜ 待開始</td></tr>
+          <tr><td>M7 安全 + 管理後台</td><td>2026-08-17</td><td>—</td><td class="future">⬜ 待開始</td></tr>
+          <tr><td>M8 內測</td><td>2026-08-31</td><td>—</td><td class="future">⬜ 待開始</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- All Endpoints -->
+  <section>
+    <h2>🔌 全部 API 端點（20 個）</h2>
+
+    <h3>Auth / Profiles / Preferences（Phase 1）</h3>
+    <div class="endpoint-item"><span class="method POST">POST</span><span class="path">/auth/register</span><span class="desc">註冊帳號</span></div>
+    <div class="endpoint-item"><span class="method POST">POST</span><span class="path">/auth/login</span><span class="desc">登入，JSON body</span></div>
+    <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/auth/me</span><span class="desc">查看自己帳號</span></div>
+    <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/profiles/me</span><span class="desc">查看個人檔案</span></div>
+    <div class="endpoint-item"><span class="method PUT">PUT</span><span class="path">/profiles/me</span><span class="desc">更新個人檔案</span></div>
+    <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/profiles/{user_id}</span><span class="desc">查看他人公開資料</span></div>
+    <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/preferences/me</span><span class="desc">查看偏好設定</span></div>
+    <div class="endpoint-item"><span class="method PUT">PUT</span><span class="path">/preferences/me</span><span class="desc">更新偏好</span></div>
+
+    <h3>Photos / Tags / Discover（Phase 2）<span class="p2-badge" style="margin-left:.5rem;">P2</span></h3>
+    <div class="endpoint-item"><span class="method POST">POST</span><span class="path">/photos</span><span class="desc">上傳照片（≤5MB, ≥400px）</span></div>
+    <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/photos/me</span><span class="desc">查看我的照片</span></div>
+    <div class="endpoint-item"><span class="method DELETE">DELETE</span><span class="path">/photos/{photo_id}</span><span class="desc">刪除照片</span></div>
+    <div class="endpoint-item"><span class="method PUT">PUT</span><span class="path">/photos/{photo_id}/primary</span><span class="desc">設定主照片</span></div>
+    <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/tags</span><span class="desc">列出 30 個興趣標籤</span></div>
+    <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/discover?limit=20</span><span class="desc">推薦對象列表（需完整檔案）</span></div>
+
+    <h3>Likes / Passes / Matches（Phase 3）<span class="new-badge" style="margin-left:.5rem;">P3 NEW</span></h3>
+    <div class="endpoint-item"><span class="method POST">POST</span><span class="path">/likes/{user_id}</span><span class="desc">喜歡某人；互相喜歡自動建立 Match，回傳 is_match: true</span></div>
+    <div class="endpoint-item"><span class="method POST">POST</span><span class="path">/passes/{user_id}</span><span class="desc">略過某人（不再出現在 Discover）</span></div>
+    <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/likes/quota</span><span class="desc">今日 Like 使用量（50次/天，UTC 00:00 重置）</span></div>
+    <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/matches</span><span class="desc">查看所有配對成功的對象</span></div>
+    <div class="endpoint-item"><span class="method DELETE">DELETE</span><span class="path">/matches/{match_id}</span><span class="desc">取消配對（雙向軟刪除）</span></div>
+  </section>
+
+  <!-- Match Flow -->
+  <section>
+    <h2>💘 配對流程圖</h2>
+    <div class="card">
+      <h3>互相喜歡 → 自動配對</h3>
+      <div class="flow">
+        <div class="flow-box trigger">A 按 POST /likes/B</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">Like 記錄寫入 DB<br><small style="color:var(--muted)">is_match: false</small></div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">B 按 POST /likes/A</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">偵測到 A 已 Like B</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box result">建立 Match！<br><small>is_match: true</small></div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">略過 → 永久排除</h3>
+      <div class="flow">
+        <div class="flow-box trigger">A 按 POST /passes/B</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">Pass 記錄寫入 DB</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box result">B 不再出現在 A 的 Discover</div>
+      </div>
+
+      <h3 style="margin-top:1.5rem;">取消配對</h3>
+      <div class="flow">
+        <div class="flow-box trigger">DELETE /matches/{id}</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box">is_active = false（軟刪除）</div>
+        <span class="flow-arrow">→</span>
+        <div class="flow-box result">雙方的配對清單都消失</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Business Rules -->
+  <section>
+    <h2>📋 業務規則</h2>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <thead><tr><th>規則</th><th>行為</th><th>錯誤代碼</th></tr></thead>
+        <tbody>
+          <tr><td>每日 Like 配額</td><td>預設 50 次 / 天（UTC），超過回傳 HTTP 429</td><td><code>DAILY_LIMIT_REACHED</code></td></tr>
+          <tr><td>自我 Like / Pass</td><td>不允許對自己操作</td><td><code>SELF_LIKE</code> / <code>SELF_PASS</code></td></tr>
+          <tr><td>重複 Like</td><td>已操作過同一人則拒絕</td><td><code>ALREADY_ACTED</code></td></tr>
+          <tr><td>重複 Pass</td><td>靜默成功，冪等操作</td><td>—</td></tr>
+          <tr><td>取消配對權限</td><td>只有配對中的兩位用戶可以操作</td><td><code>NOT_YOUR_MATCH</code></td></tr>
+          <tr><td>Match ID 唯一性</td><td>以 min(uid1, uid2) 確保同一對只有一筆</td><td>—</td></tr>
+          <tr><td>Discover 排除</td><td>已 Like 或 Pass 的用戶不再顯示</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- How to Test -->
+  <section>
+    <h2>🧪 測試指南（Phase 3 配對功能）</h2>
+    <div class="card">
+
+      <h3>【情境 A】Swagger UI 操作（最直觀）</h3>
+      <p style="color:var(--muted);margin-bottom:1rem;">開啟 <a href="http://localhost:8000/docs" target="_blank">http://localhost:8000/docs</a></p>
+      <div class="steps">
+        <div class="step"><strong>用兩個 Seed 帳號分別登入並授權</strong><br>
+          帳號 1：<code>alice@test.com</code> / 帳號 2：<code>bob@test.com</code>，密碼皆 <code>Seed1234!</code><br>
+          （需要兩個瀏覽器分頁，各自 Authorize）</div>
+        <div class="step"><strong>查 Bob 的 user_id</strong> — <code>GET /auth/me</code>（以 Bob token 登入查看）</div>
+        <div class="step"><strong>Alice 喜歡 Bob</strong> — <code>POST /likes/{bob_id}</code>（以 Alice 授權）<br>
+          回傳：<code>{"is_match": false, "match_id": null, "message": "已送出喜歡"}</code></div>
+        <div class="step"><strong>Bob 喜歡 Alice</strong> — <code>POST /likes/{alice_id}</code>（以 Bob 授權）<br>
+          回傳：<code>{"is_match": true, "match_id": 1, "message": "配對成功！"}</code> 🎉</div>
+        <div class="step"><strong>查看配對清單</strong> — <code>GET /matches</code>（任一帳號）<br>
+          可看到對方的 display_name 與主照片</div>
+        <div class="step"><strong>查看今日 Like 配額</strong> — <code>GET /likes/quota</code><br>
+          顯示 <code>used: 1, limit: 50, remaining: 49</code></div>
+        <div class="step"><strong>取消配對</strong> — <code>DELETE /matches/{match_id}</code><br>
+          狀態碼 204，配對消失</div>
+      </div>
+
+      <h3>【情境 B】PowerShell 一鍵測試腳本</h3>
+      <div class="ps-block">
+        <div class="ps-comment"># ── 登入兩個帳號 ──────────────────────────────</div>
+        <div><span class="ps-var">$ra</span> = <span class="ps-cmd">Invoke-RestMethod</span> -Method Post -Uri <span class="ps-str">"http://localhost:8000/auth/login"</span> -ContentType <span class="ps-str">"application/json"</span> -Body <span class="ps-str">'{"email":"alice@test.com","password":"Seed1234!"}'</span></div>
+        <div><span class="ps-var">$rb</span> = <span class="ps-cmd">Invoke-RestMethod</span> -Method Post -Uri <span class="ps-str">"http://localhost:8000/auth/login"</span> -ContentType <span class="ps-str">"application/json"</span> -Body <span class="ps-str">'{"email":"bob@test.com","password":"Seed1234!"}'</span></div>
+        <br>
+        <div class="ps-comment"># ── 取得各自 ID ───────────────────────────────</div>
+        <div><span class="ps-var">$alice</span> = <span class="ps-cmd">Invoke-RestMethod</span> -Uri <span class="ps-str">"http://localhost:8000/auth/me"</span> -Headers @{Authorization=<span class="ps-str">"Bearer $($ra.access_token)"</span>}</div>
+        <div><span class="ps-var">$bob</span>   = <span class="ps-cmd">Invoke-RestMethod</span> -Uri <span class="ps-str">"http://localhost:8000/auth/me"</span> -Headers @{Authorization=<span class="ps-str">"Bearer $($rb.access_token)"</span>}</div>
+        <br>
+        <div class="ps-comment"># ── Alice 喜歡 Bob ────────────────────────────</div>
+        <div><span class="ps-cmd">Invoke-RestMethod</span> -Method Post -Uri <span class="ps-str">"http://localhost:8000/likes/$($bob.id)"</span> -Headers @{Authorization=<span class="ps-str">"Bearer $($ra.access_token)"</span>} | <span class="ps-cmd">ConvertTo-Json</span></div>
+        <div class="ps-out"># → {"is_match": false, "match_id": null, "message": "已送出喜歡"}</div>
+        <br>
+        <div class="ps-comment"># ── Bob 喜歡 Alice → 配對觸發！──────────────</div>
+        <div><span class="ps-var">$match</span> = <span class="ps-cmd">Invoke-RestMethod</span> -Method Post -Uri <span class="ps-str">"http://localhost:8000/likes/$($alice.id)"</span> -Headers @{Authorization=<span class="ps-str">"Bearer $($rb.access_token)"</span>}</div>
+        <div><span class="ps-cmd">Write-Host</span> <span class="ps-str">"配對成功？"</span> <span class="ps-var">$match.is_match</span>  <span class="ps-out"># → True</span></div>
+        <div><span class="ps-cmd">Write-Host</span> <span class="ps-str">"Match ID ："</span> <span class="ps-var">$match.match_id</span></div>
+        <br>
+        <div class="ps-comment"># ── 查看 Alice 的配對清單 ─────────────────────</div>
+        <div><span class="ps-cmd">Invoke-RestMethod</span> -Uri <span class="ps-str">"http://localhost:8000/matches"</span> -Headers @{Authorization=<span class="ps-str">"Bearer $($ra.access_token)"</span>} | <span class="ps-cmd">ConvertTo-Json</span></div>
+        <br>
+        <div class="ps-comment"># ── 查看 Like 配額 ────────────────────────────</div>
+        <div><span class="ps-cmd">Invoke-RestMethod</span> -Uri <span class="ps-str">"http://localhost:8000/likes/quota"</span> -Headers @{Authorization=<span class="ps-str">"Bearer $($ra.access_token)"</span>} | <span class="ps-cmd">ConvertTo-Json</span></div>
+      </div>
+
+      <h3>【情境 C】略過測試</h3>
+      <div class="ps-block">
+        <div class="ps-comment"># Carol 略過 David → David 不再出現在 Carol 的 Discover</div>
+        <div><span class="ps-var">$rc</span> = <span class="ps-cmd">Invoke-RestMethod</span> -Method Post -Uri <span class="ps-str">"http://localhost:8000/auth/login"</span> -ContentType <span class="ps-str">"application/json"</span> -Body <span class="ps-str">'{"email":"carol@test.com","password":"Seed1234!"}'</span></div>
+        <div><span class="ps-var">$rd</span> = <span class="ps-cmd">Invoke-RestMethod</span> -Method Post -Uri <span class="ps-str">"http://localhost:8000/auth/login"</span> -ContentType <span class="ps-str">"application/json"</span> -Body <span class="ps-str">'{"email":"david@test.com","password":"Seed1234!"}'</span></div>
+        <div><span class="ps-var">$david</span> = <span class="ps-cmd">Invoke-RestMethod</span> -Uri <span class="ps-str">"http://localhost:8000/auth/me"</span> -Headers @{Authorization=<span class="ps-str">"Bearer $($rd.access_token)"</span>}</div>
+        <div><span class="ps-cmd">Invoke-RestMethod</span> -Method Post -Uri <span class="ps-str">"http://localhost:8000/passes/$($david.id)"</span> -Headers @{Authorization=<span class="ps-str">"Bearer $($rc.access_token)"</span>} | <span class="ps-cmd">ConvertTo-Json</span></div>
+        <div class="ps-out"># → {"message": "已略過"}</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Test Results -->
+  <section>
+    <h2>✅ pytest 測試結果</h2>
+    <div class="card">
+      <div class="test-bar"><div class="test-fill" style="width:100%;">55 / 55 PASSED — 100%</div></div>
+      <table style="margin-top:1rem;">
+        <thead><tr><th>測試檔案</th><th>數量</th><th>說明</th></tr></thead>
+        <tbody>
+          <tr><td><code>test_auth.py</code></td><td>11</td><td>註冊、登入、JWT、錯誤處理</td></tr>
+          <tr><td><code>test_profile.py</code></td><td>8</td><td>個人檔案 CRUD、年齡限制、偏好設定</td></tr>
+          <tr><td><code>test_photos.py</code></td><td>13</td><td>上傳驗證、最大張數、刪除重排</td></tr>
+          <tr><td><code>test_discover.py</code></td><td>6</td><td>推薦列表、分頁、完整檔案驗證</td></tr>
+          <tr><td><code>test_likes.py</code> <span class="new-badge">NEW</span></td><td>17</td><td>Like / Pass / Match / Quota 全邏輯</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Next Phase -->
+  <section>
+    <h2>🚀 Phase 4 — M5 聊天系統（下一步）</h2>
+    <div class="card">
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>WebSocket 即時聊天</strong><p><code>WS /ws/chat/{match_id}</code> — 配對後才能聊天</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>GET /messages/{match_id}</strong><p>查看歷史訊息（分頁）</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>Message 模型</strong><p>建立 DB 模型 + Alembic migration（sender_id, match_id, content, is_read）</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>已讀標記</strong><p>PUT /messages/{match_id}/read — 標記訊息為已讀</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>連線管理</strong><p>ConnectionManager 管理多用戶 WebSocket 連線池</p></div></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Dating App MVP — Phase 3 Report &nbsp;·&nbsp; Generated: 2026-06-21 &nbsp;·&nbsp;
+  Repo: <a href="https://github.com/s07362022/datefortest" target="_blank">github.com/s07362022/datefortest</a>
+</footer>
+
+</body>
+</html>
