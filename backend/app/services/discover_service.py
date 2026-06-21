@@ -4,6 +4,7 @@ from typing import Optional
 from sqlalchemy import and_, not_, or_, select
 from sqlalchemy.orm import Session
 
+from app.models.like import Like, LikeActionEnum
 from app.models.photo import ModerationStatusEnum, Photo
 from app.models.preference import Preference
 from app.models.profile import Profile
@@ -75,19 +76,14 @@ def get_discover_candidates(
     max_age = me_prefs.max_age if me_prefs else 99
     pref_genders = set(me_prefs.preferred_genders.split(",")) if me_prefs else {"everyone"}
 
-    # Subquery: users already liked/passed by current user
-    liked_ids_subq = None
-    try:
-        from app.models.like import Like  # Phase 3 model
-        liked_ids_subq = select(Like.to_user_id).where(Like.from_user_id == current_user.id)
-    except Exception:
-        pass
+    # Subquery: users already liked or passed by current user
+    liked_ids_subq = select(Like.to_user_id).where(Like.from_user_id == current_user.id)
 
-    # Subquery: blocked users (both directions)
+    # Subquery: blocked users (both directions) — Phase 6
     blocked_ids_subq = None
     blocking_ids_subq = None
     try:
-        from app.models.block import Block  # Phase 6 model
+        from app.models.block import Block
         blocked_ids_subq = select(Block.blocked_id).where(Block.blocker_id == current_user.id)
         blocking_ids_subq = select(Block.blocker_id).where(Block.blocked_id == current_user.id)
     except Exception:
@@ -103,8 +99,7 @@ def get_discover_candidates(
         )
     )
 
-    if liked_ids_subq is not None:
-        query = query.filter(not_(User.id.in_(liked_ids_subq)))
+    query = query.filter(not_(User.id.in_(liked_ids_subq)))
     if blocked_ids_subq is not None:
         query = query.filter(
             not_(User.id.in_(blocked_ids_subq)),
