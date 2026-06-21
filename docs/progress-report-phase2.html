@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dating App MVP — Phase 2 進度報告</title>
+  <style>
+    :root {
+      --primary: #e85d75;
+      --primary-dark: #c23f5c;
+      --accent: #ff9eb0;
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --surface2: #16213e;
+      --border: #2a2a4a;
+      --text: #e8e8f0;
+      --muted: #8888aa;
+      --green: #4caf82;
+      --yellow: #f5c842;
+      --blue: #4f8ef7;
+      --red: #e85d75;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; }
+
+    header {
+      background: linear-gradient(135deg, #c23f5c 0%, #7b2ff7 100%);
+      padding: 3rem 2rem 2rem;
+      text-align: center;
+    }
+    header h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.5px; }
+    header p { color: rgba(255,255,255,0.85); margin-top: .5rem; font-size: 1.05rem; }
+    header .badges { display: flex; gap: .75rem; justify-content: center; margin-top: 1.25rem; flex-wrap: wrap; }
+    .badge { background: rgba(255,255,255,0.18); border-radius: 20px; padding: .3rem .9rem; font-size: .85rem; font-weight: 600; }
+    .badge.green { background: rgba(76,175,130,0.35); color: #a8f0ce; }
+    .badge.blue  { background: rgba(79,142,247,0.35); color: #a8c8ff; }
+    .badge.purple { background: rgba(123,47,247,0.35); color: #d0b8ff; }
+
+    main { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    section { margin-bottom: 2.5rem; }
+    h2 { font-size: 1.35rem; font-weight: 700; color: var(--primary); border-left: 4px solid var(--primary); padding-left: .75rem; margin-bottom: 1.25rem; }
+    h3 { font-size: 1.05rem; font-weight: 600; color: var(--accent); margin-bottom: .75rem; margin-top: 1.25rem; }
+
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+
+    /* Stats grid */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; }
+    .stat { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; text-align: center; }
+    .stat .num { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
+    .stat .label { font-size: .8rem; color: var(--muted); margin-top: .2rem; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* Milestone table */
+    table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+    th { background: var(--surface2); color: var(--muted); font-weight: 600; text-align: left; padding: .65rem 1rem; border-bottom: 1px solid var(--border); }
+    td { padding: .65rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.03); }
+    .status-done   { color: var(--green); font-weight: 600; }
+    .status-next   { color: var(--yellow); font-weight: 600; }
+    .status-future { color: var(--muted); }
+
+    /* API endpoint list */
+    .endpoint-group { margin-bottom: 1.5rem; }
+    .endpoint-item { display: flex; align-items: flex-start; gap: .75rem; padding: .6rem .75rem; border-radius: 8px; margin-bottom: .4rem; background: var(--surface2); border: 1px solid var(--border); font-family: monospace; font-size: .875rem; }
+    .method { font-weight: 700; min-width: 60px; text-align: center; border-radius: 5px; padding: .15rem .4rem; font-size: .8rem; }
+    .method.GET    { background: rgba(79,142,247,0.2);  color: #7eb8ff; border: 1px solid #4f8ef7; }
+    .method.POST   { background: rgba(76,175,130,0.2);  color: #a8f0ce; border: 1px solid #4caf82; }
+    .method.PUT    { background: rgba(245,200,66,0.2);  color: #ffe080; border: 1px solid #f5c842; }
+    .method.DELETE { background: rgba(232,93,117,0.2);  color: #ffb0bb; border: 1px solid #e85d75; }
+    .path { color: var(--text); flex: 1; }
+    .desc { color: var(--muted); font-family: 'Segoe UI', sans-serif; font-size: .82rem; }
+    .new-badge { background: var(--primary); color: #fff; border-radius: 4px; padding: .1rem .4rem; font-size: .7rem; font-family: sans-serif; font-weight: 700; }
+
+    /* Test results */
+    .test-bar { background: var(--surface2); border-radius: 10px; overflow: hidden; height: 22px; margin-bottom: .5rem; }
+    .test-fill { background: linear-gradient(90deg, var(--green), #2ecc71); height: 100%; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: .78rem; font-weight: 700; color: #fff; }
+
+    /* Swagger guide */
+    .steps { counter-reset: step; }
+    .step { counter-increment: step; padding: .85rem 1rem .85rem 3.5rem; position: relative; border-left: 3px solid var(--border); margin-bottom: .5rem; background: var(--surface2); border-radius: 0 8px 8px 0; }
+    .step::before { content: counter(step); position: absolute; left: -1px; top: 50%; transform: translateY(-50%); background: var(--primary); color: #fff; width: 26px; height: 26px; border-radius: 50%; font-size: .8rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .step code { background: rgba(255,255,255,0.08); padding: .15rem .4rem; border-radius: 4px; font-size: .88rem; color: var(--accent); }
+    .step strong { color: var(--text); }
+
+    /* Score formula */
+    .formula { background: var(--surface2); border: 1px dashed var(--border); border-radius: 10px; padding: 1.25rem; font-family: monospace; font-size: .95rem; text-align: center; letter-spacing: .5px; }
+    .formula span { color: var(--primary); font-weight: 700; }
+
+    /* Seed users */
+    .user-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: .75rem; }
+    .user-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: .85rem; font-size: .85rem; }
+    .user-card .name { font-weight: 700; color: var(--accent); margin-bottom: .3rem; }
+    .user-card .detail { color: var(--muted); font-size: .78rem; line-height: 1.7; }
+
+    /* Next phase */
+    .next-item { display: flex; gap: .75rem; align-items: flex-start; padding: .6rem 0; border-bottom: 1px solid var(--border); }
+    .next-item:last-child { border-bottom: none; }
+    .next-bullet { color: var(--yellow); font-size: 1.1rem; }
+    .next-content strong { color: var(--text); }
+    .next-content p { color: var(--muted); font-size: .85rem; margin-top: .1rem; }
+
+    code { background: rgba(255,255,255,0.08); padding: .15rem .4rem; border-radius: 4px; font-size: .88rem; color: var(--accent); font-family: monospace; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    footer { text-align: center; color: var(--muted); font-size: .8rem; padding: 2rem; border-top: 1px solid var(--border); margin-top: 2rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💕 Dating App MVP</h1>
+  <p>Phase 2 完成報告 ─ 照片上傳 + 標籤 + 推薦探索</p>
+  <div class="badges">
+    <span class="badge green">38/38 Tests PASSED</span>
+    <span class="badge blue">15 API Endpoints</span>
+    <span class="badge purple">M3 完成超前排程</span>
+    <span class="badge">2026-06-21</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Stats -->
+  <section>
+    <h2>📊 累計數據</h2>
+    <div class="stats">
+      <div class="stat"><div class="num">38</div><div class="label">Tests Passed</div></div>
+      <div class="stat"><div class="num">15</div><div class="label">API Endpoints</div></div>
+      <div class="stat"><div class="num">5</div><div class="label">Git Commits</div></div>
+      <div class="stat"><div class="num">7</div><div class="label">DB Tables</div></div>
+      <div class="stat"><div class="num">30</div><div class="label">Interest Tags</div></div>
+      <div class="stat"><div class="num">10</div><div class="label">Seed Users</div></div>
+    </div>
+  </section>
+
+  <!-- Milestone -->
+  <section>
+    <h2>🗓 里程碑進度</h2>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <table>
+        <thead>
+          <tr><th>里程碑</th><th>目標日期</th><th>實際完成</th><th>狀態</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>M1 專案骨架</td><td>2026-06-22</td><td>2026-06-21</td><td class="status-done">✅ 完成</td></tr>
+          <tr><td>M2 帳號 + 個人檔案</td><td>2026-06-29</td><td>2026-06-21</td><td class="status-done">✅ 完成</td></tr>
+          <tr><td>M3 照片 + 推薦</td><td>2026-07-06</td><td>2026-06-21</td><td class="status-done">✅ 完成（超前16天）</td></tr>
+          <tr><td>M4 配對（Like / Pass / Match）</td><td>2026-07-13</td><td>—</td><td class="status-next">⏳ 下一步</td></tr>
+          <tr><td>M5 聊天（WebSocket）</td><td>2026-07-20</td><td>—</td><td class="status-future">⬜ 待開始</td></tr>
+          <tr><td>M5.5 升 JDK 17</td><td>2026-07-27</td><td>—</td><td class="status-future">⬜ 待開始</td></tr>
+          <tr><td>M6 Android 原型</td><td>2026-08-10</td><td>—</td><td class="status-future">⬜ 待開始</td></tr>
+          <tr><td>M7 安全 + 管理後台</td><td>2026-08-17</td><td>—</td><td class="status-future">⬜ 待開始</td></tr>
+          <tr><td>M8 內測</td><td>2026-08-31</td><td>—</td><td class="status-future">⬜ 待開始</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- All API Endpoints -->
+  <section>
+    <h2>🔌 全部 API 端點（15 個）</h2>
+
+    <h3>Auth — 認證</h3>
+    <div class="endpoint-group">
+      <div class="endpoint-item"><span class="method POST">POST</span><span class="path">/auth/register</span><span class="desc">註冊帳號，回傳 JWT token</span></div>
+      <div class="endpoint-item"><span class="method POST">POST</span><span class="path">/auth/login</span><span class="desc">登入，JSON body: {email, password}</span></div>
+      <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/auth/me</span><span class="desc">查看自己的帳號資料</span></div>
+    </div>
+
+    <h3>Profiles — 個人檔案</h3>
+    <div class="endpoint-group">
+      <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/profiles/me</span><span class="desc">查看自己的完整檔案（含完成度）</span></div>
+      <div class="endpoint-item"><span class="method PUT">PUT</span><span class="path">/profiles/me</span><span class="desc">更新檔案（顯示名稱、生日、性別、城市、簡介、標籤）</span></div>
+      <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/profiles/{user_id}</span><span class="desc">查看指定用戶的公開檔案</span></div>
+    </div>
+
+    <h3>Preferences — 配對偏好</h3>
+    <div class="endpoint-group">
+      <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/preferences/me</span><span class="desc">查看自己的偏好設定</span></div>
+      <div class="endpoint-item"><span class="method PUT">PUT</span><span class="path">/preferences/me</span><span class="desc">更新偏好（性別、年齡範圍、最大距離）</span></div>
+    </div>
+
+    <h3>Photos — 照片 <span class="new-badge">Phase 2 新增</span></h3>
+    <div class="endpoint-group">
+      <div class="endpoint-item"><span class="method POST">POST</span><span class="path">/photos</span><span class="desc">上傳照片（multipart/form-data，JPEG/PNG/WebP，≤5MB，≥400×400px）</span></div>
+      <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/photos/me</span><span class="desc">查看自己所有照片（依 sort_order 排序）</span></div>
+      <div class="endpoint-item"><span class="method DELETE">DELETE</span><span class="path">/photos/{photo_id}</span><span class="desc">刪除照片（自動重排序，若刪主照片則自動換下一張）</span></div>
+      <div class="endpoint-item"><span class="method PUT">PUT</span><span class="path">/photos/{photo_id}/primary</span><span class="desc">設定主照片（封面）</span></div>
+      <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/photos/file/{filename}</span><span class="desc">下載/瀏覽照片（需認證）</span></div>
+    </div>
+
+    <h3>Tags — 興趣標籤 <span class="new-badge">Phase 2 新增</span></h3>
+    <div class="endpoint-group">
+      <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/tags</span><span class="desc">列出全部 30 個預設興趣標籤</span></div>
+    </div>
+
+    <h3>Discover — 推薦探索 <span class="new-badge">Phase 2 新增</span></h3>
+    <div class="endpoint-group">
+      <div class="endpoint-item"><span class="method GET">GET</span><span class="path">/discover?limit=20&amp;cursor=</span><span class="desc">推薦對象列表（需完整個人檔案）</span></div>
+    </div>
+  </section>
+
+  <!-- Discover Algorithm -->
+  <section>
+    <h2>🎯 推薦算法</h2>
+    <div class="card">
+      <div class="formula">
+        <span>總分</span> = Profile完整度 × 0.4 + 活躍度分數(0-20) + 距離分數(0-20) + 共同興趣分數(0-20)
+      </div>
+      <table style="margin-top:1.25rem;">
+        <thead><tr><th>評分項目</th><th>滿分</th><th>規則</th></tr></thead>
+        <tbody>
+          <tr><td>Profile 完整度</td><td>100 × 40%</td><td>display_name / birthday / gender / interested_in / city / bio≥20字 / 有照片 / ≥3標籤</td></tr>
+          <tr><td>活躍度</td><td>20</td><td>1h內=20, 24h內=15, 72h內=10, 1週內=5, 更久=0</td></tr>
+          <tr><td>距離</td><td>20</td><td>越近越高分，超過 max_distance_km 自動排除</td></tr>
+          <tr><td>共同興趣</td><td>20</td><td>每個共同標籤 +5 分（上限 20）</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:1rem; color:var(--muted); font-size:.85rem;">
+        🚫 自動排除：自己 / 已封鎖用戶（Phase 6 實裝）/ 已 Like 或 Pass 過的用戶（Phase 4 實裝）
+      </p>
+    </div>
+  </section>
+
+  <!-- Photo validation -->
+  <section>
+    <h2>📷 照片驗證規則</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th>規則</th><th>限制</th><th>錯誤代碼</th></tr></thead>
+        <tbody>
+          <tr><td>檔案格式</td><td>JPEG / PNG / WebP</td><td><code>INVALID_FILE_TYPE</code></td></tr>
+          <tr><td>檔案大小</td><td>≤ 5 MB</td><td><code>FILE_TOO_LARGE</code></td></tr>
+          <tr><td>最小尺寸</td><td>≥ 400 × 400 px</td><td><code>IMAGE_TOO_SMALL</code></td></tr>
+          <tr><td>最多張數</td><td>每人最多 6 張</td><td><code>MAX_PHOTOS_REACHED</code></td></tr>
+          <tr><td>第一張照片</td><td>自動設為主照片（is_primary: true）</td><td>—</td></tr>
+          <tr><td>審核狀態</td><td>新上傳預設 <code>pending</code>，不影響顯示</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- How to test -->
+  <section>
+    <h2>🧪 如何測試（Swagger UI 操作指南）</h2>
+    <div class="card">
+      <p style="color:var(--muted); margin-bottom:1rem;">開啟瀏覽器前往：<a href="http://localhost:8000/docs" target="_blank">http://localhost:8000/docs</a></p>
+
+      <h3>【測試情境 A】用 Seed 帳號登入並探索</h3>
+      <div class="steps">
+        <div class="step"><strong>登入 Seed 帳號</strong> — 點 <code>POST /auth/login</code> → 輸入 <code>{"email":"alice@test.com","password":"Seed1234!"}</code> → 複製 access_token</div>
+        <div class="step"><strong>授權</strong> — 點右上角 <strong>Authorize 🔒</strong>，貼上 token，格式：<code>Bearer eyJ...</code></div>
+        <div class="step"><strong>查看個人檔案</strong> — <code>GET /profiles/me</code> → 可看到 Alice 的完整資料與標籤</div>
+        <div class="step"><strong>探索推薦</strong> — <code>GET /discover?limit=5</code> → 回傳其他符合條件的用戶（依評分排序）</div>
+        <div class="step"><strong>查看標籤清單</strong> — <code>GET /tags</code> → 列出全部 30 個興趣標籤（可用 id 更新個人標籤）</div>
+      </div>
+
+      <h3>【測試情境 B】新帳號上傳照片</h3>
+      <div class="steps">
+        <div class="step"><strong>註冊新帳號</strong> — <code>POST /auth/register</code> → <code>{"email":"newuser@test.com","password":"Test1234!"}</code></div>
+        <div class="step"><strong>取得 token 後授權</strong>（同上 Authorize）</div>
+        <div class="step"><strong>上傳照片</strong> — <code>POST /photos</code> → 點 Try it out → Choose File → 選一張 JPG（≥400px）→ Execute</div>
+        <div class="step"><strong>查看照片</strong> — <code>GET /photos/me</code> → 可看到剛上傳的照片資訊</div>
+        <div class="step"><strong>更新個人檔案</strong> — <code>PUT /profiles/me</code> → 設定完整資料（顯示名稱、生日、性別、簡介、tag_ids）</div>
+        <div class="step"><strong>再測試 Discover</strong> — 完整個人檔案後才能呼叫 <code>GET /discover</code>，否則會回傳 403 PROFILE_INCOMPLETE</div>
+      </div>
+
+      <h3>【測試情境 C】用 PowerShell 快速驗證</h3>
+      <div class="steps">
+        <div class="step">登入 Seed 帳號取得 token：<br>
+          <code>$r = Invoke-RestMethod -Method Post -Uri "http://localhost:8000/auth/login" -ContentType "application/json" -Body '{"email":"bob@test.com","password":"Seed1234!"}'</code></div>
+        <div class="step">呼叫 Discover：<br>
+          <code>Invoke-RestMethod -Uri "http://localhost:8000/discover?limit=3" -Headers @{Authorization="Bearer $($r.access_token)"} | ConvertTo-Json -Depth 5</code></div>
+        <div class="step">查看 Tags：<br>
+          <code>Invoke-RestMethod -Uri "http://localhost:8000/tags" -Headers @{Authorization="Bearer $($r.access_token)"}</code></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seed Users -->
+  <section>
+    <h2>🌱 Seed 測試帳號（密碼一律 Seed1234!）</h2>
+    <div class="user-grid">
+      <div class="user-card"><div class="name">Alice (alice@test.com)</div><div class="detail">女 · 1995 · 台北<br>標籤：旅遊、咖啡、設計<br>偏好：男性</div></div>
+      <div class="user-card"><div class="name">Bob (bob@test.com)</div><div class="detail">男 · 1993 · 台北<br>標籤：旅遊、攝影、科技<br>偏好：女性</div></div>
+      <div class="user-card"><div class="name">Carol (carol@test.com)</div><div class="detail">女 · 1997 · 新北<br>標籤：瑜伽、烹飪、健身<br>偏好：所有人</div></div>
+      <div class="user-card"><div class="name">David (david@test.com)</div><div class="detail">男 · 1991 · 台北<br>標籤：閱讀、跑步、創業<br>偏好：女性</div></div>
+      <div class="user-card"><div class="name">Emma (emma@test.com)</div><div class="detail">女 · 1998 · 桃園<br>標籤：音樂、電影、咖啡<br>偏好：男性</div></div>
+      <div class="user-card"><div class="name">Frank (frank@test.com)</div><div class="detail">男 · 1994 · 台中<br>標籤：攝影、登山、旅遊<br>偏好：所有人</div></div>
+      <div class="user-card"><div class="name">Grace (grace@test.com)</div><div class="detail">女 · 1996 · 台北<br>標籤：電影、閱讀、音樂<br>偏好：男性</div></div>
+      <div class="user-card"><div class="name">Henry (henry@test.com)</div><div class="detail">男 · 1992 · 高雄<br>標籤：烹飪、旅遊、美食<br>偏好：女性</div></div>
+      <div class="user-card"><div class="name">Ivy (ivy@test.com)</div><div class="detail">女 · 1999 · 台北<br>標籤：繪畫、設計、手作<br>偏好：女性</div></div>
+      <div class="user-card"><div class="name">Jack (jack@test.com)</div><div class="detail">男 · 1990 · 台北<br>標籤：單車、登山、設計<br>偏好：男性</div></div>
+    </div>
+    <p style="color:var(--muted); font-size:.85rem; margin-top:1rem;">
+      ⚠️ 測試帳號的 seed 照片為佔位符（placeholder.jpg），上傳真實照片時需重新呼叫 POST /photos
+    </p>
+  </section>
+
+  <!-- Test Results -->
+  <section>
+    <h2>✅ pytest 測試結果</h2>
+    <div class="card">
+      <div class="test-bar"><div class="test-fill" style="width:100%;">38 / 38 PASSED — 100%</div></div>
+      <table style="margin-top:1rem;">
+        <thead><tr><th>測試檔案</th><th>測試數</th><th>說明</th></tr></thead>
+        <tbody>
+          <tr><td><code>test_auth.py</code></td><td>11</td><td>註冊、登入、JWT 驗證、錯誤處理</td></tr>
+          <tr><td><code>test_profile.py</code></td><td>8</td><td>個人檔案 CRUD、年齡限制、偏好設定</td></tr>
+          <tr><td><code>test_photos.py</code></td><td>13</td><td>上傳驗證、最大張數、刪除重排、主照片設定</td></tr>
+          <tr><td><code>test_discover.py</code></td><td>6</td><td>需認證、需完整檔案、排除自己、分頁</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Tech Stack -->
+  <section>
+    <h2>🛠 技術棧</h2>
+    <div class="card">
+      <table>
+        <thead><tr><th>層級</th><th>技術</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td>Web 框架</td><td>FastAPI 0.115</td><td>REST API、自動 OpenAPI 文件</td></tr>
+          <tr><td>資料庫</td><td>PostgreSQL 16 (Docker)</td><td>主資料庫</td></tr>
+          <tr><td>ORM</td><td>SQLAlchemy 2.x</td><td>模型定義與查詢</td></tr>
+          <tr><td>Migrations</td><td>Alembic</td><td>版本化 schema 管理</td></tr>
+          <tr><td>驗證</td><td>Pydantic v2</td><td>請求/回應模型驗證</td></tr>
+          <tr><td>認證</td><td>JWT (PyJWT) + bcrypt</td><td>無狀態 token 認證</td></tr>
+          <tr><td>圖片處理</td><td>Pillow (PIL)</td><td>照片尺寸驗證</td></tr>
+          <tr><td>測試</td><td>pytest + TestClient</td><td>整合測試，獨立測試資料庫</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Next Phase -->
+  <section>
+    <h2>🚀 Phase 3 — M4 配對系統（下一步）</h2>
+    <div class="card">
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>POST /likes/{user_id}</strong><p>喜歡某人；若對方也喜歡你，自動建立 Match 並回傳 is_match: true</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>POST /passes/{user_id}</strong><p>略過某人；此後不再出現在 discover 清單中</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>GET /matches</strong><p>查看所有配對成功的對象，含最後互動時間</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>DELETE /matches/{match_id}</strong><p>取消配對（雙向移除）</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>Like / Pass / Match 模型</strong><p>建立 DB 模型 + Alembic migration，discover 自動排除已互動者</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>每日 Like 配額</strong><p>預設每日 50 次，限制頻繁刷卡</p></div></div>
+      <div class="next-item"><span class="next-bullet">→</span><div class="next-content"><strong>tests/test_likes.py + test_matches.py</strong><p>雙向配對邏輯、配額限制、重複 like 防護</p></div></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Dating App MVP — Phase 2 Report &nbsp;·&nbsp; Generated: 2026-06-21 &nbsp;·&nbsp;
+  Repo: <a href="https://github.com/s07362022/datefortest" target="_blank">github.com/s07362022/datefortest</a>
+</footer>
+
+</body>
+</html>
