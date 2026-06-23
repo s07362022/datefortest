@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dating App MVP — v0.3.0 Phase 3 完成報告</title>
+  <style>
+    :root{--p:#e85d75;--pa:#c23f5c;--acc:#ff9eb0;--bg:#0f0f1a;--s1:#1a1a2e;--s2:#16213e;--bd:#2a2a4a;--tx:#e8e8f0;--mu:#8888aa;--gn:#4caf82;--yw:#f5c842;--bl:#4f8ef7}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--tx);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.6}
+    header{background:linear-gradient(135deg,#c23f5c,#7b2ff7);padding:3rem 2rem 2rem;text-align:center}
+    header h1{font-size:2.4rem;font-weight:800}
+    header p{color:rgba(255,255,255,.85);margin-top:.5rem;font-size:1.05rem}
+    .badges{display:flex;gap:.75rem;justify-content:center;margin-top:1.25rem;flex-wrap:wrap}
+    .badge{background:rgba(255,255,255,.18);border-radius:20px;padding:.3rem .9rem;font-size:.85rem;font-weight:600}
+    .badge.g{background:rgba(76,175,130,.35);color:#a8f0ce}
+    .badge.b{background:rgba(79,142,247,.35);color:#a8c8ff}
+    .badge.pu{background:rgba(123,47,247,.35);color:#d0b8ff}
+    .badge.y{background:rgba(245,200,66,.35);color:#ffe080}
+    main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+    section{margin-bottom:2.5rem}
+    h2{font-size:1.35rem;font-weight:700;color:var(--p);border-left:4px solid var(--p);padding-left:.75rem;margin-bottom:1.25rem}
+    h3{font-size:1.05rem;font-weight:600;color:var(--acc);margin-bottom:.75rem;margin-top:1.25rem}
+    .card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+    .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1rem}
+    .stat{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:1.25rem;text-align:center}
+    .stat .n{font-size:2.2rem;font-weight:800;color:var(--p)}
+    .stat .l{font-size:.8rem;color:var(--mu);margin-top:.2rem;text-transform:uppercase;letter-spacing:.5px}
+    table{width:100%;border-collapse:collapse;font-size:.92rem}
+    th{background:var(--s2);color:var(--mu);font-weight:600;text-align:left;padding:.65rem 1rem;border-bottom:1px solid var(--bd)}
+    td{padding:.65rem 1rem;border-bottom:1px solid var(--bd);vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    .done{color:var(--gn);font-weight:600}.next{color:var(--yw);font-weight:600}.fut{color:var(--mu)}
+    .ep{display:flex;align-items:flex-start;gap:.75rem;padding:.6rem .75rem;border-radius:8px;margin-bottom:.4rem;background:var(--s2);border:1px solid var(--bd);font-family:monospace;font-size:.875rem}
+    .m{font-weight:700;min-width:60px;text-align:center;border-radius:5px;padding:.15rem .4rem;font-size:.8rem}
+    .m.GET{background:rgba(79,142,247,.2);color:#7eb8ff;border:1px solid #4f8ef7}
+    .m.POST{background:rgba(76,175,130,.2);color:#a8f0ce;border:1px solid #4caf82}
+    .m.PUT{background:rgba(245,200,66,.2);color:#ffe080;border:1px solid #f5c842}
+    .m.DEL{background:rgba(232,93,117,.2);color:#ffb0bb;border:1px solid #e85d75}
+    .m.WS{background:rgba(123,47,247,.2);color:#d0b8ff;border:1px solid #7b2ff7}
+    .path{color:var(--tx);flex:1}.desc{color:var(--mu);font-family:'Segoe UI',sans-serif;font-size:.82rem}
+    .nb{background:var(--p);color:#fff;border-radius:4px;padding:.1rem .4rem;font-size:.7rem;font-family:sans-serif;font-weight:700}
+    .p2{background:#7b2ff7;color:#fff;border-radius:4px;padding:.1rem .4rem;font-size:.7rem;font-family:sans-serif;font-weight:700}
+    .test-bar{background:var(--s2);border-radius:10px;overflow:hidden;height:24px;margin-bottom:.75rem}
+    .test-fill{background:linear-gradient(90deg,var(--gn),#2ecc71);height:100%;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff}
+    .steps{counter-reset:step}
+    .step{counter-increment:step;padding:.85rem 1rem .85rem 3.5rem;position:relative;border-left:3px solid var(--bd);margin-bottom:.5rem;background:var(--s2);border-radius:0 8px 8px 0}
+    .step::before{content:counter(step);position:absolute;left:-1px;top:50%;transform:translateY(-50%);background:var(--p);color:#fff;width:26px;height:26px;border-radius:50%;font-size:.8rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+    .flow{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
+    .fb{background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:.5rem 1rem;font-size:.88rem}
+    .fb.t{border-color:var(--p);color:var(--p);font-weight:700}
+    .fb.r{border-color:var(--gn);color:var(--gn);font-weight:700}
+    .fa{color:var(--mu);font-size:1.2rem}
+    .ps{background:#0d1117;border:1px solid #30363d;border-radius:10px;padding:1.25rem;font-family:'Consolas',monospace;font-size:.85rem;line-height:1.8;overflow-x:auto}
+    .pc{color:#6e7681}.pv{color:#ffa657}.po{color:#56d364}.ps2{color:#a5d6ff}
+    .vt{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+    .vc{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:1rem}
+    .vc .vn{font-weight:700;color:var(--p);font-size:1.1rem}.vc .vd{font-size:.85rem;color:var(--mu);margin-top:.3rem}
+    .ni{display:flex;gap:.75rem;align-items:flex-start;padding:.6rem 0;border-bottom:1px solid var(--bd)}
+    .ni:last-child{border-bottom:none}
+    .nib{color:var(--yw);font-size:1.1rem}
+    .nic strong{color:var(--tx)}.nic p{color:var(--mu);font-size:.85rem;margin-top:.1rem}
+    code{background:rgba(255,255,255,.08);padding:.15rem .4rem;border-radius:4px;font-size:.88rem;color:var(--acc);font-family:monospace}
+    a{color:var(--bl);text-decoration:none}a:hover{text-decoration:underline}
+    footer{text-align:center;color:var(--mu);font-size:.8rem;padding:2rem;border-top:1px solid var(--bd);margin-top:2rem}
+  </style>
+</head>
+<body>
+<header>
+  <h1>💕 Dating App MVP</h1>
+  <p>v0.3.0 — Phase 3 完成 | 配對系統（Like / Pass / Match）使用者驗證通過</p>
+  <div class="badges">
+    <span class="badge g">55/55 Tests PASSED</span>
+    <span class="badge b">20 API Endpoints</span>
+    <span class="badge y">M1~M4 全部完成</span>
+    <span class="badge pu">v0.1.0 → v0.3.0</span>
+    <span class="badge">2026-06-24 更新</span>
+  </div>
+</header>
+
+<main>
+
+<!-- Version History -->
+<section>
+  <h2>🏷 版本紀錄</h2>
+  <div class="vt">
+    <div class="vc"><div class="vn">v0.1.0</div><div class="vd">Phase 1 · 2026-06-21<br>帳號 + 個人檔案 + 偏好<br>19 tests · 9 endpoints</div></div>
+    <div class="vc"><div class="vn">v0.2.0</div><div class="vd">Phase 2 · 2026-06-21<br>照片上傳 + 標籤 + Discover<br>38 tests · 15 endpoints</div></div>
+    <div class="vc" style="border-color:var(--p)"><div class="vn" style="color:var(--acc)">v0.3.0 ← 現在</div><div class="vd">Phase 3 · 2026-06-21<br>Like / Pass / Match 配對<br>55 tests · 20 endpoints</div></div>
+    <div class="vc" style="opacity:.5"><div class="vn">v0.4.0</div><div class="vd">Phase 4 · 進行中<br>WebSocket 聊天室<br>目標：2026-07-20</div></div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section>
+  <h2>📊 累計數據</h2>
+  <div class="stats">
+    <div class="stat"><div class="n">55</div><div class="l">Tests Passed</div></div>
+    <div class="stat"><div class="n">20</div><div class="l">API Endpoints</div></div>
+    <div class="stat"><div class="n">7</div><div class="l">Git Commits</div></div>
+    <div class="stat"><div class="n">9</div><div class="l">DB Tables</div></div>
+    <div class="stat"><div class="n">30</div><div class="l">Interest Tags</div></div>
+    <div class="stat"><div class="n">50</div><div class="l">Daily Like Limit</div></div>
+  </div>
+</section>
+
+<!-- Milestone -->
+<section>
+  <h2>🗓 里程碑進度</h2>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead><tr><th>里程碑</th><th>目標</th><th>實際完成</th><th>Tag</th><th>狀態</th></tr></thead>
+      <tbody>
+        <tr><td>M1 專案骨架</td><td>2026-06-22</td><td>2026-06-21</td><td><code>v0.1.0</code></td><td class="done">✅ 完成</td></tr>
+        <tr><td>M2 帳號 + 個人檔案</td><td>2026-06-29</td><td>2026-06-21</td><td><code>v0.1.0</code></td><td class="done">✅ 完成</td></tr>
+        <tr><td>M3 照片 + 推薦</td><td>2026-07-06</td><td>2026-06-21</td><td><code>v0.2.0</code></td><td class="done">✅ 完成</td></tr>
+        <tr><td>M4 配對（Like / Pass / Match）</td><td>2026-07-13</td><td>2026-06-21</td><td><code>v0.3.0</code></td><td class="done">✅ 完成（超前22天）</td></tr>
+        <tr><td>M5 聊天（WebSocket）</td><td>2026-07-20</td><td>—</td><td>—</td><td class="next">⏳ 進行中</td></tr>
+        <tr><td>M5.5 升 JDK 17</td><td>2026-07-27</td><td>—</td><td>—</td><td class="fut">⬜ 待開始</td></tr>
+        <tr><td>M6 Android 原型</td><td>2026-08-10</td><td>—</td><td>—</td><td class="fut">⬜ 待開始</td></tr>
+        <tr><td>M7 安全 + 管理後台</td><td>2026-08-17</td><td>—</td><td>—</td><td class="fut">⬜ 待開始</td></tr>
+        <tr><td>M8 內測</td><td>2026-08-31</td><td>—</td><td>—</td><td class="fut">⬜ 待開始</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- All endpoints -->
+<section>
+  <h2>🔌 全部 API 端點（20 個）</h2>
+  <h3>Phase 1 — 帳號 / 檔案 / 偏好</h3>
+  <div class="ep"><span class="m POST">POST</span><span class="path">/auth/register</span><span class="desc">註冊帳號</span></div>
+  <div class="ep"><span class="m POST">POST</span><span class="path">/auth/login</span><span class="desc">登入（JSON body）</span></div>
+  <div class="ep"><span class="m GET">GET</span><span class="path">/auth/me</span><span class="desc">查看自己帳號</span></div>
+  <div class="ep"><span class="m GET">GET</span><span class="path">/profiles/me</span><span class="desc">查看個人檔案</span></div>
+  <div class="ep"><span class="m PUT">PUT</span><span class="path">/profiles/me</span><span class="desc">更新個人檔案</span></div>
+  <div class="ep"><span class="m GET">GET</span><span class="path">/profiles/{user_id}</span><span class="desc">查看他人公開資料</span></div>
+  <div class="ep"><span class="m GET">GET</span><span class="path">/preferences/me</span><span class="desc">查看偏好設定</span></div>
+  <div class="ep"><span class="m PUT">PUT</span><span class="path">/preferences/me</span><span class="desc">更新偏好</span></div>
+  <h3>Phase 2 — 照片 / 標籤 / 推薦 <span class="p2">P2</span></h3>
+  <div class="ep"><span class="m POST">POST</span><span class="path">/photos</span><span class="desc">上傳照片（≤5MB, ≥400px）</span></div>
+  <div class="ep"><span class="m GET">GET</span><span class="path">/photos/me</span><span class="desc">查看我的照片</span></div>
+  <div class="ep"><span class="m DEL">DEL</span><span class="path">/photos/{photo_id}</span><span class="desc">刪除照片</span></div>
+  <div class="ep"><span class="m PUT">PUT</span><span class="path">/photos/{photo_id}/primary</span><span class="desc">設定主照片</span></div>
+  <div class="ep"><span class="m GET">GET</span><span class="path">/tags</span><span class="desc">列出 30 個興趣標籤</span></div>
+  <div class="ep"><span class="m GET">GET</span><span class="path">/discover?limit=20</span><span class="desc">推薦對象列表（需完整檔案）</span></div>
+  <h3>Phase 3 — 配對系統 <span class="nb">P3</span></h3>
+  <div class="ep"><span class="m POST">POST</span><span class="path">/likes/{user_id}</span><span class="desc">喜歡某人；互相喜歡自動建立 Match，回傳 is_match</span></div>
+  <div class="ep"><span class="m POST">POST</span><span class="path">/passes/{user_id}</span><span class="desc">略過某人（不再出現在 Discover）</span></div>
+  <div class="ep"><span class="m GET">GET</span><span class="path">/likes/quota</span><span class="desc">今日 Like 使用量（50次/天）</span></div>
+  <div class="ep"><span class="m GET">GET</span><span class="path">/matches</span><span class="desc">查看所有配對成功的對象</span></div>
+  <div class="ep"><span class="m DEL">DEL</span><span class="path">/matches/{match_id}</span><span class="desc">取消配對（雙向軟刪除）</span></div>
+  <h3>Phase 4 — 聊天（即將加入）</h3>
+  <div class="ep" style="opacity:.5"><span class="m WS">WS</span><span class="path">/ws/chat/{match_id}</span><span class="desc">即時聊天（WebSocket）</span></div>
+  <div class="ep" style="opacity:.5"><span class="m GET">GET</span><span class="path">/messages/{match_id}</span><span class="desc">歷史訊息（分頁）</span></div>
+  <div class="ep" style="opacity:.5"><span class="m PUT">PUT</span><span class="path">/messages/{match_id}/read</span><span class="desc">標記已讀</span></div>
+</section>
+
+<!-- Test guide -->
+<section>
+  <h2>🧪 Phase 3 測試指南（已驗證）</h2>
+  <div class="card">
+    <h3>PowerShell 快速測試</h3>
+    <div class="ps">
+      <div class="pc"># 1. 登入兩個帳號</div>
+      <div><span class="pv">$ra</span> = Invoke-RestMethod -Method Post -Uri <span class="ps2">"http://localhost:8000/auth/login"</span> -ContentType <span class="ps2">"application/json"</span> -Body <span class="ps2">'{"email":"alice@test.com","password":"Seed1234!"}'</span></div>
+      <div><span class="pv">$rb</span> = Invoke-RestMethod -Method Post -Uri <span class="ps2">"http://localhost:8000/auth/login"</span> -ContentType <span class="ps2">"application/json"</span> -Body <span class="ps2">'{"email":"bob@test.com","password":"Seed1234!"}'</span></div>
+      <br>
+      <div class="pc"># 2. 取得 ID（Alice=2, Bob=3）</div>
+      <div><span class="pv">$alice</span> = Invoke-RestMethod -Uri <span class="ps2">"http://localhost:8000/auth/me"</span> -Headers @{Authorization=<span class="ps2">"Bearer $($ra.access_token)"</span>}</div>
+      <div><span class="pv">$bob</span>   = Invoke-RestMethod -Uri <span class="ps2">"http://localhost:8000/auth/me"</span> -Headers @{Authorization=<span class="ps2">"Bearer $($rb.access_token)"</span>}</div>
+      <br>
+      <div class="pc"># 3. Bob 喜歡 Alice</div>
+      <div>Invoke-RestMethod -Method Post -Uri <span class="ps2">"http://localhost:8000/likes/$($alice.id)"</span> -Headers @{Authorization=<span class="ps2">"Bearer $($rb.access_token)"</span>} | ConvertTo-Json</div>
+      <div class="po"># → {"is_match": false, ...}</div>
+      <br>
+      <div class="pc"># 4. Alice 喜歡 Bob → 配對！</div>
+      <div>Invoke-RestMethod -Method Post -Uri <span class="ps2">"http://localhost:8000/likes/$($bob.id)"</span> -Headers @{Authorization=<span class="ps2">"Bearer $($ra.access_token)"</span>} | ConvertTo-Json</div>
+      <div class="po"># → {"is_match": true, "match_id": 1, ...}</div>
+      <br>
+      <div class="pc"># 5. 查看配對清單</div>
+      <div>Invoke-RestMethod -Uri <span class="ps2">"http://localhost:8000/matches"</span> -Headers @{Authorization=<span class="ps2">"Bearer $($ra.access_token)"</span>} | ConvertTo-Json</div>
+    </div>
+  </div>
+</section>
+
+<!-- Test results -->
+<section>
+  <h2>✅ pytest 測試結果（55/55）</h2>
+  <div class="card">
+    <div class="test-bar"><div class="test-fill" style="width:100%">55 / 55 PASSED — 100%</div></div>
+    <table style="margin-top:1rem">
+      <thead><tr><th>測試檔案</th><th>數量</th><th>說明</th></tr></thead>
+      <tbody>
+        <tr><td><code>test_auth.py</code></td><td>11</td><td>註冊、登入、JWT、錯誤處理</td></tr>
+        <tr><td><code>test_profile.py</code></td><td>8</td><td>個人檔案 CRUD、年齡限制、偏好設定</td></tr>
+        <tr><td><code>test_photos.py</code></td><td>13</td><td>上傳驗證、最大張數、刪除重排</td></tr>
+        <tr><td><code>test_discover.py</code></td><td>6</td><td>推薦列表、分頁、完整檔案驗證</td></tr>
+        <tr><td><code>test_likes.py</code> <span class="nb">P3</span></td><td>17</td><td>Like / Pass / Match / Quota 全邏輯</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Next -->
+<section>
+  <h2>🚀 Phase 4 — M5 聊天系統（進行中）</h2>
+  <div class="card">
+    <div class="ni"><span class="nib">→</span><div class="nic"><strong>Message 模型 + Alembic migration</strong><p>新增 messages 資料表（match_id、sender_id、content、is_read）</p></div></div>
+    <div class="ni"><span class="nib">→</span><div class="nic"><strong>WebSocket /ws/chat/{match_id}</strong><p>即時雙向通訊，配對雙方專屬，ConnectionManager 管理連線池</p></div></div>
+    <div class="ni"><span class="nib">→</span><div class="nic"><strong>GET /messages/{match_id}</strong><p>查看歷史訊息（分頁），最新訊息優先</p></div></div>
+    <div class="ni"><span class="nib">→</span><div class="nic"><strong>PUT /messages/{match_id}/read</strong><p>標記該對話所有訊息為已讀</p></div></div>
+    <div class="ni"><span class="nib">→</span><div class="nic"><strong>tests/test_messages.py</strong><p>REST + WebSocket 整合測試</p></div></div>
+    <div class="ni"><span class="nib">→</span><div class="nic"><strong>git tag v0.4.0 + push</strong><p>完成後打版本 tag 並推送</p></div></div>
+  </div>
+</section>
+
+</main>
+<footer>
+  Dating App MVP — v0.3.0 Report &nbsp;·&nbsp; Updated: 2026-06-24 &nbsp;·&nbsp;
+  Repo: <a href="https://github.com/s07362022/datefortest" target="_blank">github.com/s07362022/datefortest</a> &nbsp;·&nbsp;
+  Tags: <a href="https://github.com/s07362022/datefortest/releases" target="_blank">v0.1.0 → v0.3.0</a>
+</footer>
+</body>
+</html>
