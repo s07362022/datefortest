@@ -5,6 +5,7 @@ from app.models.photo import Photo, ModerationStatusEnum
 from app.models.preference import Preference
 from app.models.like import Like, LikeActionEnum
 from app.models.match import Match
+from app.models.message import Message
 
 __all__ = [
     "User",
@@ -14,4 +15,5 @@ __all__ = [
     "Preference",
     "Like", "LikeActionEnum",
     "Match",
+    "Message",
 ]

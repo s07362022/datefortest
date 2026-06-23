@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
 from app.api.v1.router import api_router
+from app.api.ws import ws_router
 
 
 app = FastAPI(
@@ -34,6 +35,7 @@ def health_check():
 
 
 app.include_router(api_router)
+app.include_router(ws_router)
 
 
 @app.get("/", tags=["System"])
