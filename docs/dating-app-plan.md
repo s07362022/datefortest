@@ -1,11 +1,11 @@
 ﻿# Android Dating App MVP Plan
 
 建立日期：2026-06-20
-最後更新：2026-06-24
+最後更新：2026-06-24 (v0.4.0)
 目標平台：Android first
 主要語言：Python
 
-## 進度總覽（最後更新：2026-06-24）
+## 進度總覽（最後更新：2026-06-24 (v0.4.0)）
 
 | 里程碑 | 目標日期 | 實際完成 | 狀態 |
 |--------|---------|---------|------|
@@ -19,7 +19,7 @@
 | M7 安全+管理後台 | 2026-08-17 | — | ⬜ 待開始 |
 | M8 內測 | 2026-08-31 | — | ⬜ 待開始 |
 
-pytest：55/55 PASSED｜Git commits：7｜DB 資料表：9｜API 端點：20｜版本：v0.3.0
+pytest：68/68 PASSED｜Git commits：9｜DB 資料表：10｜API 端點：23｜版本：v0.4.0
 目前本機狀態：Python 3.10.11 可用，Git 可用，Docker 未安裝，Java 未安裝
 Canonical project path：F:\cursor_coding\project01\dating-app
 
